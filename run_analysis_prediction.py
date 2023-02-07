@@ -10,7 +10,7 @@ Created on Wed May 18 10:40:55 2022
 import sys
 
 path_list = sys.path
-module_path = '/Users/guohan/Documents/Code/Binary_Classification_Analysis'
+module_path = '/Users/guohan/Documents/Codes/Binary_Classification_Analysis'
 if module_path not in sys.path:
     sys.path.append(module_path)
     print('Add module path')
