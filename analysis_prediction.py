@@ -23,8 +23,8 @@ font.set_size(12)
 def combine_multiple_expt(srcDir, output_file = None):
     """
     combine predicted results 
-    :para srcDir: str, the directory to store score files
-    :para output_file: str, output file name
+    :param srcDir: str, the directory to store score files
+    :param output_file: str, output file name
     """
     num = 0
     dfs = []
@@ -70,9 +70,9 @@ def combine_multiple_expt(srcDir, output_file = None):
 def combine_prediction_target(input_file, target_file, output_file = None):
     """
     combine predicted results and target value
-    :para input_file: str, the name of the predicted file
-    :para target_file: str, the name of the target file
-    :para output_file: str, output file name
+    :param input_file: str, the name of the predicted file
+    :param target_file: str, the name of the target file
+    :param output_file: str, output file name
     """
     # read files
     df_prediction = pd.read_csv(input_file, index_col = 0)
@@ -104,8 +104,8 @@ def combine_prediction_target(input_file, target_file, output_file = None):
 def cal_precision_recall(predicted_labels, true_labels):
     """
     calculate precision and recall
-    :para predicted_labels: list of predicted labels, i.e., 1 or 0
-    :para true_labels: list of true labels, i.e., 1, 0, Nan
+    :param predicted_labels: list of predicted labels, i.e., 1 or 0
+    :param true_labels: list of true labels, i.e., 1, 0, Nan
     :return: precision_1, recall_1, precision_0, recall_0
     """
     assert len(predicted_labels) == len(true_labels), 'Error: Number of predicted labels should be the same as that of true labels'
@@ -141,10 +141,10 @@ def cal_precision_recall(predicted_labels, true_labels):
 def plot_precision_recall(input_file, num_points, prediction_column_name='score', target_column_name='Label'):
     """
     plot precision recall curves
-    :para input_file: str, the name of the file with predicted score and target label
-    :para threshold: float, threshold to label predictions
-    :para prediction_column_name: str, the name of the column with predicted scores
-    :para target_column_name: str, the name of the column with target labels
+    :param input_file: str, the name of the file with predicted score and target label
+    :param threshold: float, threshold to label predictions
+    :param prediction_column_name: str, the name of the column with predicted scores
+    :param target_column_name: str, the name of the column with target labels
     """
     # read files
     df = pd.read_csv(input_file, index_col = 0)
@@ -204,10 +204,10 @@ def get_selected(input_file, threshold_list, how = 'any', output_file = None):
     """
     return a subset of selected compounds, 
     satisfy that the score of the nth experiment >= the nth threshold
-    :para input_file: str, input file name of the predicted score
-    :para threshold_list: list of floats, the threshold for experiments
-    :para how: str, how to label, 'all', 'any' and 'vote'
-    :para output_file: str, output file name
+    :param input_file: str, input file name of the predicted score
+    :param threshold_list: list of floats, the threshold for experiments
+    :param how: str, how to label, 'all', 'any' and 'vote'
+    :param output_file: str, output file name
     """
     # read files
     df_prediction = pd.read_csv(input_file, index_col = 0)
@@ -255,9 +255,9 @@ def isPositive(scores, threshold_list, how = 'any'):
     """
     helper function for get_selected()
     decide whether this compound is positive based on scores
-    :para scores: list of float, the predicted score for experiment
-    :para threshold_list: list of float, the threshold for experiment
-    :para how: str, how to label, 'all', 'any', 'vote' and 'average'
+    :param scores: list of float, the predicted score for experiment
+    :param threshold_list: list of float, the threshold for experiment
+    :param how: str, how to label, 'all', 'any', 'vote' and 'average'
     :return: bool, wheter this compound is positive
     """
     assert len(scores) == len(threshold_list), 'Error: Number of experiments should be same as number of thresholds'
@@ -288,8 +288,8 @@ def isPositive(scores, threshold_list, how = 'any'):
 def get_jaccard_similarity(input_file, threshold):
     """
     calculate Jaccard similarity between two libraries
-    :para input_file: str, input file name of the predicted score
-    :para threshold: float, the threshold for data
+    :param input_file: str, input file name of the predicted score
+    :param threshold: float, the threshold for data
     """
     # read files
     df = pd.read_csv(input_file, index_col = 0)    
@@ -314,10 +314,10 @@ def jaccard_similarity(df, threshold_list, row1, row2):
     """
     helper function for get_jaccard_similarity()
     calculate jaccard similarity (intersection/union) for row1 and row2 of df
-    :para df: DataFrame object, the table containing row1 and row2
-    :para threshold_list: list of float, the threshold for experiment
-    :para row1: str, the row name of row1
-    :para row2: str, the row name of row2
+    :param df: DataFrame object, the table containing row1 and row2
+    :param threshold_list: list of float, the threshold for experiment
+    :param row1: str, the row name of row1
+    :param row2: str, the row name of row2
     :return: float, the calculated jaccard similarity
     """
     # calculate intersection
