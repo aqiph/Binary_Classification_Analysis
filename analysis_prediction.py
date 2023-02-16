@@ -415,21 +415,21 @@ def jaccard_similarity(df, threshold_list, expt1, expt2):
 if __name__ == '__main__':
 
     ### Combine results ###
-    # srcDir = 'tests/prediction'
-    # input_file_target = 'tests/target.csv'
-    # output_file = 'combine'
-    # combine_multiple_expts(srcDir, input_file_target=input_file_target, output_file=output_file)
+    srcDir = 'tests/prediction'
+    input_file_target = 'tests/target.csv'
+    output_file = 'combine'
+    combine_multiple_expts(srcDir, input_file_target=input_file_target, output_file=output_file)
 
     ### Calculate precision and recall for multiple experiments ###
-    # srcDir = 'tests/prediction'
-    # threshold = 0.5
-    # output_file = 'predicted_results'
-    # print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label', output_file=output_file)
+    srcDir = 'tests/prediction'
+    threshold = 0.5
+    output_file = 'predicted_results'
+    print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label', output_file=output_file)
 
     ### Plot precision and recall ###
-    # input_file = 'tests/expt.csv'
-    # num_points = 100
-    # plot_PR(input_file, num_points, prediction_column_name='score', target_column_name='Label')
+    input_file = 'tests/expt.csv'
+    num_points = 100
+    plot_PR(input_file, num_points, prediction_column_name='score', target_column_name='Label')
 
     ### Select data based on rules ###
     srcDir = 'tests/prediction'
@@ -439,7 +439,7 @@ if __name__ == '__main__':
     select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output_file)
 
     ### Calculate jaccard similarity between different experiments ###
-    # get_jaccard_similarity(input_file, threshold = threshold)
+    get_jaccard_similarity(input_file, threshold = threshold)
 
     
     
