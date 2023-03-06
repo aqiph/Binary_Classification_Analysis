@@ -278,8 +278,12 @@ def isPositive(scores, threshold_list, how='any'):
         ave = np.mean(scores)
         return ave >= threshold_list[0]
 
+    elif how == 'two':
+        vote_score = np.sum(labels)
+        return vote_score >= 2.0
 
-def select_cmps(input_file, threshold_list, how = 'any', output_file = None):
+
+def select_cmps(input_file, threshold_list, how = 'any', output_file = None, output_option='selected'):
     """
     return a subset of selected compounds, 
     satisfy that the score of the nth experiment >= the nth threshold
@@ -287,11 +291,18 @@ def select_cmps(input_file, threshold_list, how = 'any', output_file = None):
     :param threshold_list: list of floats, thresholds for different experiments
     :param how: str, how to label, 'all', 'any', 'vote' and 'average'
     :param output_file: str, output file name
+    :param output_option: str, options to output data, allowed values include 'selected', 'not_selected' and 'all'
     :return: list of floats, precision_1, recall_1, precision_0, recall_0 for current strategy
     """
     # read files
     df_prediction = pd.read_csv(input_file, index_col = 0)
     COLUMNS = df_prediction.columns.tolist()
+    if 'Training_set_ID' not in COLUMNS:
+        df_prediction['Training_set_ID'] = ''
+        COLUMNS.append('Training_set_ID')
+    if 'True_Label' not in COLUMNS:
+        df_prediction['True_Label'] = np.nan
+        COLUMNS.append('True_Label')
     expts = df_prediction.columns.tolist()[2:-2]
     assert len(expts) == len(threshold_list), 'Error: Number of experiments should be same as number of thresholds'
     
@@ -303,7 +314,13 @@ def select_cmps(input_file, threshold_list, how = 'any', output_file = None):
     
     # get selected compounds
     df_prediction['Selected'] = df_prediction.apply(lambda row: isPositive([row[expt] for expt in expts], threshold_list, how), axis=1)
-    df = pd.DataFrame(df_prediction[df_prediction['Selected']], columns = COLUMNS)
+    if output_option == 'selected':
+        df = pd.DataFrame(df_prediction[df_prediction['Selected']], columns=COLUMNS)
+    elif output_option == 'not_selected':
+        df = pd.DataFrame(df_prediction[~df_prediction['Selected']], columns=COLUMNS)
+    elif output_option == 'all':
+        df = pd.DataFrame(df_prediction, columns = COLUMNS+['Selected'])
+        df['Selected'] = df['Selected'].apply(lambda x: int(x))
 
     # calculate precision and recall
     precision_1, recall_1, precision_0, recall_0 = calculate_PR(df_prediction['Selected'].tolist(),df_prediction['True_Label'].tolist())
@@ -315,7 +332,7 @@ def select_cmps(input_file, threshold_list, how = 'any', output_file = None):
     return precision_1, recall_1, precision_0, recall_0
 
 
-def select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output_file = None):
+def select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output_file = None, output_option='selected'):
     """
     use multiple strategies to return a subset of selected compounds,
     satisfy that the score of the nth experiment >= the nth threshold
@@ -323,6 +340,7 @@ def select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output
     :param input_file_target: str, path of the file containing true labels
     :param threshold: float, threshold to label predicted results
     :param output_file: str, output file name
+    :param output_option: str, options to output data, allowed values include 'selected', 'not_selected' and 'all'
     """
     # Parameters: strategies
     strategies = ['any', 'vote', 'all', 'average']
@@ -345,7 +363,7 @@ def select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output
     threshold_list = [threshold for _ in range(num_expts)]
 
     for i, strategy in enumerate(strategies):
-        precision_1, recall_1, precision_0, recall_0 = select_cmps(input_file, threshold_list, how=strategy, output_file=output_file)
+        precision_1, recall_1, precision_0, recall_0 = select_cmps(input_file, threshold_list, how=strategy, output_file=output_file, output_option=output_option)
         strategy_PR = pd.DataFrame({'Precision_1':[precision_1], 'Recall_1':[recall_1], 'Precision_0':[precision_0], 'Recall_0':[recall_0]})
         strategy_PR.rename(index={0:strategy}, inplace=True)
         strategy_PR = strategy_PR.applymap(lambda x: '{:2.4f}'.format(x))
@@ -420,11 +438,12 @@ if __name__ == '__main__':
     output_file = 'combine'
     combine_multiple_expts(srcDir, input_file_target=input_file_target, output_file=output_file)
 
-    ### Calculate precision and recall for multiple experiments ###
+    ### Calculate and print precision and recall for multiple experiments ###
     srcDir = 'tests/prediction'
     threshold = 0.5
     output_file = 'predicted_results'
-    print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label', output_file=output_file)
+    print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label',
+                                output_file=output_file)
 
     ### Plot precision and recall ###
     input_file = 'tests/expt.csv'
@@ -432,14 +451,21 @@ if __name__ == '__main__':
     plot_PR(input_file, num_points, prediction_column_name='score', target_column_name='Label')
 
     ### Select data based on rules ###
+    input_file = 'tests/combine_39.csv'
+    threshold_list = [0.5, 0.5, 0.5, 0.5, 0.5]
+    select_cmps(input_file, threshold_list, how='any', output_file=None, output_option='selected')
+
+    ### Select data based on multiple rules ###
     srcDir = 'tests/prediction'
     input_file_target = 'tests/target.csv'
     threshold = 0.5
-    output_file = 'predited_results'
-    select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output_file)
+    output_file = 'predicted_results'
+    select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output_file, output_option='selected')
 
     ### Calculate jaccard similarity between different experiments ###
-    get_jaccard_similarity(input_file, threshold = threshold)
+    input_file = 'tests/combine_39.csv'
+    threshold = 0.5
+    get_jaccard_similarity(input_file, threshold=threshold)
 
     
     
