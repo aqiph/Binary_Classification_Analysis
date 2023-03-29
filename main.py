@@ -25,7 +25,7 @@ def combine_multiple_expts(srcDir, input_file_target = None, output_file = None)
     combine predicted results and true labels
     :param srcDir: str, directory path of predicted results
     :param input_file_target: str, path of the file containing true labels
-    :param output_file: str, output file name
+    :param output_file: str, name of the output file
     :return: int, number of compounds
     """
     num = 0
@@ -70,7 +70,7 @@ def combine_multiple_expts(srcDir, input_file_target = None, output_file = None)
         df_merge = pd.merge(df_merge, df_target, how='left', on=['Cleaned_SMILES'])
     
     # write to file
-    df_merge.sort_values(by=df_merge.columns.tolist()[2:], ascending=False, inplace=True)
+    # df_merge.sort_values(by=df_merge.columns.tolist()[2:], ascending=False, inplace=True)
     print('Number of rows in the output file:', df_merge.shape[0])
     df_merge.to_csv(output_file + f'_{df_merge.shape[0]}.csv')
 
@@ -169,7 +169,7 @@ def print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score
     :param threshold: float, threshold to label predicted results
     :param prediction_column_name: str, column name for predicted scores
     :param target_column_name: str, column name for true labels
-    :param output_file: str, output file name
+    :param output_file: str, name of the output file
     """
     # output file
     folder, basename = os.path.split(os.path.abspath(srcDir))
@@ -290,7 +290,7 @@ def select_cmps(input_file, threshold_list, how = 'any', output_file = None, out
     :param input_file: str, path of the file containing predicted scores and true labels
     :param threshold_list: list of floats, thresholds for different experiments
     :param how: str, how to label, 'all', 'any', 'vote' and 'average'
-    :param output_file: str, output file name
+    :param output_file: str, name of the output file
     :param output_option: str, options to output data, allowed values include 'selected', 'not_selected' and 'all'
     :return: list of floats, precision_1, recall_1, precision_0, recall_0 for current strategy
     """
@@ -321,6 +321,8 @@ def select_cmps(input_file, threshold_list, how = 'any', output_file = None, out
     elif output_option == 'all':
         df = pd.DataFrame(df_prediction, columns = COLUMNS+['Selected'])
         df['Selected'] = df['Selected'].apply(lambda x: int(x))
+    else:
+        raise Exception('Error: Invalid output option.')
 
     # calculate precision and recall
     precision_1, recall_1, precision_0, recall_0 = calculate_PR(df_prediction['Selected'].tolist(),df_prediction['True_Label'].tolist())
@@ -339,7 +341,7 @@ def select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output
     :param srcDir: str, directory path of predicted results
     :param input_file_target: str, path of the file containing true labels
     :param threshold: float, threshold to label predicted results
-    :param output_file: str, output file name
+    :param output_file: str, name of the output file
     :param output_option: str, options to output data, allowed values include 'selected', 'not_selected' and 'all'
     """
     # Parameters: strategies
