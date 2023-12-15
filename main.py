@@ -58,7 +58,7 @@ def combine_multiple_expts(srcDir, input_file_target = None, output_file = None)
     output_file = os.path.join(folder, os.path.splitext(output_file)[0])
     
     # merge multiple experiments
-    df_merge = reduce(lambda left, right: pd.merge(left, right, how = 'outer', on = ['ID', 'Cleaned_SMILES']), dfs)
+    df_merge = reduce(lambda left, right: pd.merge(left, right, how = 'left', on = ['ID', 'Cleaned_SMILES']), dfs)
     columns = ['ID', 'Cleaned_SMILES'] + sorted(expts)
     df_merge = df_merge.reindex(columns, axis = 1)
 
