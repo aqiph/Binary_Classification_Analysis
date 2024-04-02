@@ -61,6 +61,7 @@ def combine_multiple_expts(srcDir, input_file_target = None, output_file = None)
     df_merge = reduce(lambda left, right: pd.merge(left, right, how = 'left', on = ['ID', 'Cleaned_SMILES']), dfs)
     columns = ['ID', 'Cleaned_SMILES'] + sorted(expts)
     df_merge = df_merge.reindex(columns, axis = 1)
+    num_expts = df_merge.shape[1] - 2
 
     # merge target labels
     if input_file_target is not None:
@@ -74,7 +75,7 @@ def combine_multiple_expts(srcDir, input_file_target = None, output_file = None)
     print('Number of rows in the output file:', df_merge.shape[0])
     df_merge.to_csv(output_file + f'_{df_merge.shape[0]}.csv')
 
-    return df_merge.shape[0]
+    return df_merge.shape[0], num_expts
 
 
 ### Calculate and plot precision and recall ###
@@ -334,18 +335,21 @@ def select_cmps(input_file, threshold_list, how = 'any', output_file = None, out
     return precision_1, recall_1, precision_0, recall_0
 
 
-def select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output_file = None, output_option='selected'):
+def select_cmps_by_multi_strategies(srcDir, input_file_target = None, threshold = 0.5, output_file = None, output_option='selected'):
     """
     use multiple strategies to return a subset of selected compounds,
     satisfy that the score of the nth experiment >= the nth threshold
-    :param srcDir: str, directory path of predicted results
+    :param srcDir: str, directory path of predicted results. None, if no True label is provided
     :param input_file_target: str, path of the file containing true labels
     :param threshold: float, threshold to label predicted results
     :param output_file: str, name of the output file
     :param output_option: str, options to output data, allowed values include 'selected', 'not_selected' and 'all'
     """
-    # Parameters: strategies
+    # Parameters: strategies, flag_cal_PR
     strategies = ['any', 'vote', 'all', 'average']
+    flag_cal_PR = True
+    if input_file_target is None:
+        flag_cal_PR = False
 
     # output file
     folder, basename = os.path.split(os.path.abspath(srcDir))
@@ -354,11 +358,13 @@ def select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output
     output_file = os.path.splitext(output_file)[0]
 
     # combine predicted results and true labels
-    num_cmps = combine_multiple_expts(srcDir, input_file_target, output_file)
+    num_cmps, num_expts = combine_multiple_expts(srcDir, input_file_target, output_file)
+    print('Combining results done!')
 
     # calculate mean and std performance
-    df_sum = calculate_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label')
-    num_expts = df_sum.shape[0] - 1
+    df_sum = pd.DataFrame()
+    if flag_cal_PR:
+        df_sum = calculate_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label')
 
     # select compounds
     input_file = os.path.join(folder, output_file + f'_{num_cmps}.csv')
@@ -366,14 +372,16 @@ def select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output
 
     for i, strategy in enumerate(strategies):
         precision_1, recall_1, precision_0, recall_0 = select_cmps(input_file, threshold_list, how=strategy, output_file=output_file, output_option=output_option)
-        strategy_PR = pd.DataFrame({'Precision_1':[precision_1], 'Recall_1':[recall_1], 'Precision_0':[precision_0], 'Recall_0':[recall_0]})
-        strategy_PR.rename(index={0:strategy}, inplace=True)
-        strategy_PR = strategy_PR.applymap(lambda x: '{:2.4f}'.format(x))
-        df_sum = pd.concat([df_sum, strategy_PR], ignore_index=False)
+        if flag_cal_PR:
+            strategy_PR = pd.DataFrame({'Precision_1':[precision_1], 'Recall_1':[recall_1], 'Precision_0':[precision_0], 'Recall_0':[recall_0]})
+            strategy_PR.rename(index={0:strategy}, inplace=True)
+            strategy_PR = strategy_PR.applymap(lambda x: '{:2.4f}'.format(x))
+            df_sum = pd.concat([df_sum, strategy_PR], ignore_index=False)
 
     # write to file
-    print('Number of rows:', df_sum.shape[0])
-    df_sum.to_csv(os.path.join(folder, output_file + '_PR.csv'))
+    if flag_cal_PR:
+        print('Number of rows:', df_sum.shape[0])
+        df_sum.to_csv(os.path.join(folder, output_file + '_PR.csv'))
 
     # compute jaccard similarity between every two experiments
     get_jaccard_similarity(input_file, threshold)
