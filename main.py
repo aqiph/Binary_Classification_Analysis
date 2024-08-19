@@ -68,7 +68,7 @@ def combine_multiple_expts(srcDir, input_file_target = None, output_file = None)
         df_target = pd.read_csv(input_file_target)
         df_target = pd.DataFrame(df_target, columns=['ID', 'Cleaned_SMILES', 'Label'])
         df_target.rename(columns={'ID': 'Training_set_ID', 'Label': 'True_Label'}, inplace=True)
-        df_merge = pd.merge(df_merge, df_target, how='left', on=['Cleaned_SMILES'])
+        df_merge = pd.merge(df_merge, df_target, how='left', on=['ID', 'Cleaned_SMILES'])
     
     # write to file
     # df_merge.sort_values(by=df_merge.columns.tolist()[2:], ascending=False, inplace=True)
