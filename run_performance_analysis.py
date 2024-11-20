@@ -15,7 +15,7 @@ if module_path not in sys.path:
     sys.path.append(module_path)
     print('Add module path')
 
-from main import combine_multiple_expts, print_PR_for_multiple_expts, plot_PR, select_cmps_by_multi_strategies, get_jaccard_similarity
+from main import print_PR_for_multiple_expts, plot_PR
 
 
 

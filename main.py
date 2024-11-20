@@ -18,74 +18,13 @@ font.set_size(12)
 
 
 
-### Combine results ###
-
-def combine_multiple_expts(srcDir, input_file_target = None, output_file = None):
-    """
-    combine predicted results and true labels
-    :param srcDir: str, directory path of predicted results
-    :param input_file_target: str, path of the file containing true labels
-    :param output_file: str, name of the output file
-    :return: int, number of compounds
-    """
-    num = 0
-    expts = []  # experiment names
-    dfs = []
-    
-    # read df
-    files = os.listdir(srcDir)
-    for file in files:
-        if os.path.splitext(file)[1] != '.csv':
-            continue
-        
-        try:
-            expt = os.path.splitext(file)[0]
-            expts.append(expt)
-            df = pd.read_csv(os.path.join(srcDir, file))
-            df = pd.DataFrame(df, columns = ['ID', 'Cleaned_SMILES', 'score'])
-            df.rename(columns = {'score': expt}, inplace = True)
-            dfs.append(df)
-            print('{} is read, number of rows: {}'.format(expt, df.shape[0]))
-            num += 1
-
-        except:
-            pass
-    
-    # output file
-    folder, basename = os.path.split(os.path.abspath(srcDir))
-    if output_file is None:
-        output_file = basename
-    output_file = os.path.join(folder, os.path.splitext(output_file)[0])
-    
-    # merge multiple experiments
-    df_merge = reduce(lambda left, right: pd.merge(left, right, how = 'left', on = ['ID', 'Cleaned_SMILES']), dfs)
-    columns = ['ID', 'Cleaned_SMILES'] + sorted(expts)
-    df_merge = df_merge.reindex(columns, axis = 1)
-    num_expts = df_merge.shape[1] - 2
-
-    # merge target labels
-    if input_file_target is not None:
-        df_target = pd.read_csv(input_file_target)
-        df_target = pd.DataFrame(df_target, columns=['ID', 'Cleaned_SMILES', 'Label'])
-        df_target.rename(columns={'ID': 'Training_set_ID', 'Label': 'True_Label'}, inplace=True)
-        df_merge = pd.merge(df_merge, df_target, how='left', on=['ID', 'Cleaned_SMILES'])
-    
-    # write to file
-    # df_merge.sort_values(by=df_merge.columns.tolist()[2:], ascending=False, inplace=True)
-    print('Number of rows in the output file:', df_merge.shape[0])
-    df_merge.to_csv(output_file + f'_{df_merge.shape[0]}.csv')
-
-    return df_merge.shape[0], num_expts
-
-
-### Calculate and plot precision and recall ###
-
+### Calculate, print and plot precision and recall ###
 def calculate_PR(predicted_labels, true_labels):
     """
-    calculate precision and recall
-    :param predicted_labels: list of ints, list of predicted labels, i.e., 1 or 0
-    :param true_labels: list of ints, list of true labels, i.e., 1, 0, Nan
-    :return: list of floats, precision_1, recall_1, precision_0, recall_0
+    Calculate precision and recall for single experiment.
+    :param predicted_labels: list of ints, list of predicted labels, i.e., 1 or 0.
+    :param true_labels: list of ints, list of true labels, i.e., 1, 0, Nan.
+    :return: list of floats, precision_1, recall_1, precision_0, recall_0.
     """
     assert len(predicted_labels) == len(true_labels), 'Error: Number of predicted labels should be the same as that of true labels'
     TP, FP, TN, FN = 0, 0, 0, 0
@@ -119,12 +58,12 @@ def calculate_PR(predicted_labels, true_labels):
 
 def calculate_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label'):
     """
-    calculate precision and recall for multiple experiments
-    :param srcDir: str, directory path of predicted results
-    :param threshold: float, threshold to label predicted results
-    :param prediction_column_name: str, column name for predicted scores
-    :param target_column_name: str, column name for true labels
-    :return: pd.DataFrame, calculated precision and recall
+    Calculate precision and recall for multiple experiments.
+    :param srcDir: str, directory path of predicted results.
+    :param threshold: float, threshold to label predicted results.
+    :param prediction_column_name: str, column name for predicted scores.
+    :param target_column_name: str, column name for true labels.
+    :return: pd.DataFrame, calculated precision and recall.
     """
     expts = []   # experiment names
     df_sum = pd.DataFrame()
@@ -165,12 +104,12 @@ def calculate_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='s
 
 def print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label', output_file = None):
     """
-    calculate precision and recall for multiple experiments
-    :param srcDir: str, directory path of predicted results
-    :param threshold: float, threshold to label predicted results
-    :param prediction_column_name: str, column name for predicted scores
-    :param target_column_name: str, column name for true labels
-    :param output_file: str, name of the output file
+    Calculate and print precision and recall for multiple experiments.
+    :param srcDir: str, directory path of predicted results.
+    :param threshold: float, threshold to label predicted results.
+    :param prediction_column_name: str, column name for predicted scores.
+    :param target_column_name: str, column name for true labels.
+    :param output_file: str, name of the output file.
     """
     # output file
     folder, basename = os.path.split(os.path.abspath(srcDir))
@@ -188,11 +127,11 @@ def print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score
 
 def plot_PR(input_file, num_points, prediction_column_name='score', target_column_name='Label'):
     """
-    plot precision recall curves
-    :param input_file: str, path of the file containing predicted scores and true labels
-    :param num_points: int, number of points on the plot
-    :param prediction_column_name: str, column name for predicted scores
-    :param target_column_name: str, column name for true labels
+    Plot precision recall curves for single experiment.
+    :param input_file: str, path of the file containing predicted scores and true labels.
+    :param num_points: int, number of points on the plot.
+    :param prediction_column_name: str, column name for predicted scores.
+    :param target_column_name: str, column name for true labels.
     """
     # read files
     df = pd.read_csv(input_file, index_col = 0)
@@ -247,15 +186,72 @@ def plot_PR(input_file, num_points, prediction_column_name='score', target_colum
 
 
 ### Select data based on rules ###
+def combine_multiple_expts(srcDir, input_file_target=None, output_file=None):
+    """
+    Combine predicted results and true labels.
+    :param srcDir: str, directory path of predicted results.
+    :param input_file_target: str, path of the file containing true labels.
+    :param output_file: str, name of the output file.
+    :return: int, number of compounds.
+    """
+    num = 0
+    expts = []  # experiment names
+    dfs = []
+
+    # read df
+    files = os.listdir(srcDir)
+    for file in files:
+        if os.path.splitext(file)[1] != '.csv':
+            continue
+
+        try:
+            expt = os.path.splitext(file)[0]
+            expts.append(expt)
+            df = pd.read_csv(os.path.join(srcDir, file))
+            df = pd.DataFrame(df, columns=['ID', 'Cleaned_SMILES', 'score'])
+            df.rename(columns={'score': expt}, inplace=True)
+            dfs.append(df)
+            print('{} is read, number of rows: {}'.format(expt, df.shape[0]))
+            num += 1
+
+        except:
+            pass
+
+    # output file
+    folder, basename = os.path.split(os.path.abspath(srcDir))
+    if output_file is None:
+        output_file = basename
+    output_file = os.path.join(folder, os.path.splitext(output_file)[0])
+
+    # merge multiple experiments
+    df_merge = reduce(lambda left, right: pd.merge(left, right, how='left', on=['ID', 'Cleaned_SMILES']), dfs)
+    columns = ['ID', 'Cleaned_SMILES'] + sorted(expts)
+    df_merge = df_merge.reindex(columns, axis=1)
+    num_expts = df_merge.shape[1] - 2
+
+    # merge target labels
+    if input_file_target is not None:
+        df_target = pd.read_csv(input_file_target)
+        df_target = pd.DataFrame(df_target, columns=['ID', 'Cleaned_SMILES', 'Label'])
+        df_target.rename(columns={'Label': 'True_Label'}, inplace=True)
+        df_merge = pd.merge(df_merge, df_target, how='left', on=['ID', 'Cleaned_SMILES'])
+
+    # write to file
+    # df_merge.sort_values(by=df_merge.columns.tolist()[2:], ascending=False, inplace=True)
+    print('Number of rows in the output file:', df_merge.shape[0])
+    df_merge.to_csv(output_file + f'_{df_merge.shape[0]}.csv')
+
+    return df_merge.shape[0], num_expts
+
 
 def isPositive(scores, threshold_list, how='any'):
     """
-    helper function for select_cmps()
-    decide whether this compound is positive based on scores
-    :param scores: list of floats, predicted scores for one compound
-    :param threshold_list: list of floats, thresholds for different experiments
-    :param how: str, how to label, 'all', 'any', 'vote' and 'average'
-    :return: bool, whether this compound is positive
+    Helper function for select_compounds().
+    Decide whether this compound is positive based on scores.
+    :param scores: list of floats, predicted scores for one compound.
+    :param threshold_list: list of floats, thresholds for different experiments.
+    :param how: str, how to label, 'all', 'any', 'vote' and 'average'.
+    :return: bool, whether this compound is positive.
     """
     assert len(scores) == len(threshold_list), 'Error: Number of experiments should be same as number of thresholds'
 
@@ -284,27 +280,24 @@ def isPositive(scores, threshold_list, how='any'):
         return vote_score >= 2.0
 
 
-def select_cmps(input_file, threshold_list, how = 'any', output_file = None, output_option='selected'):
+def select_compounds(input_file, threshold_list, how = 'any', output_file = None, output_option='selected'):
     """
-    return a subset of selected compounds, 
-    satisfy that the score of the nth experiment >= the nth threshold
-    :param input_file: str, path of the file containing predicted scores and true labels
-    :param threshold_list: list of floats, thresholds for different experiments
-    :param how: str, how to label, 'all', 'any', 'vote' and 'average'
-    :param output_file: str, name of the output file
-    :param output_option: str, options to output data, allowed values include 'selected', 'not_selected' and 'all'
-    :return: list of floats, precision_1, recall_1, precision_0, recall_0 for current strategy
+    Use the given strategy to return a subset of selected compounds,
+    satisfy that the score of the nth experiment >= the nth threshold.
+    :param input_file: str, path of the file containing predicted scores and true labels.
+    :param threshold_list: list of floats, thresholds for different experiments.
+    :param how: str, how to label, 'all', 'any', 'vote' and 'average'.
+    :param output_file: str, name of the output file.
+    :param output_option: str, options to output data, allowed values include 'selected', 'not_selected' and 'all'.
+    :return: list of floats, precision_1, recall_1, precision_0, recall_0 for current strategy.
     """
     # read files
     df_prediction = pd.read_csv(input_file, index_col = 0)
     COLUMNS = df_prediction.columns.tolist()
-    if 'Training_set_ID' not in COLUMNS:
-        df_prediction['Training_set_ID'] = ''
-        COLUMNS.append('Training_set_ID')
     if 'True_Label' not in COLUMNS:
         df_prediction['True_Label'] = np.nan
         COLUMNS.append('True_Label')
-    expts = df_prediction.columns.tolist()[2:-2]
+    expts = df_prediction.columns.tolist()[2:-1]
     assert len(expts) == len(threshold_list), 'Error: Number of experiments should be same as number of thresholds'
     
     # output file
@@ -335,15 +328,15 @@ def select_cmps(input_file, threshold_list, how = 'any', output_file = None, out
     return precision_1, recall_1, precision_0, recall_0
 
 
-def select_cmps_by_multi_strategies(srcDir, input_file_target = None, threshold = 0.5, output_file = None, output_option='selected'):
+def select_compounds_by_multi_strategies(srcDir, input_file_target = None, threshold = 0.5, output_file = None, output_option='selected'):
     """
-    use multiple strategies to return a subset of selected compounds,
-    satisfy that the score of the nth experiment >= the nth threshold
-    :param srcDir: str, directory path of predicted results. None, if no True label is provided
-    :param input_file_target: str, path of the file containing true labels
-    :param threshold: float, threshold to label predicted results
-    :param output_file: str, name of the output file
-    :param output_option: str, options to output data, allowed values include 'selected', 'not_selected' and 'all'
+    Use multiple strategies to return a subset of selected compounds,
+    satisfy that the score of the nth experiment >= the nth threshold.
+    :param srcDir: str, directory path of predicted results. None, if no True label is provided.
+    :param input_file_target: str, path of the file containing true labels.
+    :param threshold: float, threshold to label predicted results.
+    :param output_file: str, name of the output file.
+    :param output_option: str, options to output data, allowed values include 'selected', 'not_selected' and 'all'.
     """
     # Parameters: strategies, flag_cal_PR
     strategies = ['any', 'vote', 'all', 'average']
@@ -371,7 +364,7 @@ def select_cmps_by_multi_strategies(srcDir, input_file_target = None, threshold 
     threshold_list = [threshold for _ in range(num_expts)]
 
     for i, strategy in enumerate(strategies):
-        precision_1, recall_1, precision_0, recall_0 = select_cmps(input_file, threshold_list, how=strategy, output_file=output_file, output_option=output_option)
+        precision_1, recall_1, precision_0, recall_0 = select_compounds(input_file, threshold_list, how=strategy, output_file=output_file, output_option=output_option)
         if flag_cal_PR:
             strategy_PR = pd.DataFrame({'Precision_1':[precision_1], 'Recall_1':[recall_1], 'Precision_0':[precision_0], 'Recall_0':[recall_0]})
             strategy_PR.rename(index={0:strategy}, inplace=True)
@@ -391,13 +384,13 @@ def select_cmps_by_multi_strategies(srcDir, input_file_target = None, threshold 
 
 def get_jaccard_similarity(input_file, threshold):
     """
-    calculate Jaccard similarity between two libraries
-    :param input_file: str, path of the file containing predicted scores and true labels
-    :param threshold: float, threshold to label predicted results
+    Calculate Jaccard similarity between two libraries.
+    :param input_file: str, path of the file containing predicted scores and true labels.
+    :param threshold: float, threshold to label predicted results.
     """
     # read files
     df = pd.read_csv(input_file, index_col = 0)    
-    expts = df.columns.tolist()[2:-2]
+    expts = df.columns.tolist()[2:7]
     
     # output file
     folder, basename = os.path.split(os.path.abspath(input_file))  
@@ -416,13 +409,13 @@ def get_jaccard_similarity(input_file, threshold):
 
 def jaccard_similarity(df, threshold_list, expt1, expt2):
     """
-    helper function for get_jaccard_similarity()
-    calculate jaccard similarity (intersection/union) for expt1 and expt2 of df
-    :param df: DataFrame object, pd.DataFrame containing expt1 and expt2
-    :param threshold_list: list of floats, thresholds for different experiments
-    :param expt1: str, column name for expt1
-    :param expt2: str, column name for expt2
-    :return: float, the calculated jaccard similarity
+    Helper function for get_jaccard_similarity().
+    Calculate jaccard similarity (intersection/union) for expt1 and expt2 of df.
+    :param df: DataFrame object, pd.DataFrame containing expt1 and expt2.
+    :param threshold_list: list of floats, thresholds for different experiments.
+    :param expt1: str, column name for expt1.
+    :param expt2: str, column name for expt2.
+    :return: float, the calculated jaccard similarity.
     """
     # calculate intersection
     df_intersect = df.loc[df.apply(lambda row: isPositive([row[expt1], row[expt2]], threshold_list, how = 'all'), axis = 1)]
@@ -442,12 +435,6 @@ def jaccard_similarity(df, threshold_list, expt1, expt2):
 
 if __name__ == '__main__':
 
-    ### Combine results ###
-    srcDir = 'tests/prediction'
-    input_file_target = 'tests/target.csv'
-    output_file = 'combine'
-    combine_multiple_expts(srcDir, input_file_target=input_file_target, output_file=output_file)
-
     ### Calculate and print precision and recall for multiple experiments ###
     srcDir = 'tests/prediction'
     threshold = 0.5
@@ -460,17 +447,23 @@ if __name__ == '__main__':
     num_points = 100
     plot_PR(input_file, num_points, prediction_column_name='score', target_column_name='Label')
 
+    ### Combine results ###
+    srcDir = 'tests/prediction'
+    input_file_target = 'tests/target.csv'
+    output_file = 'combine'
+    combine_multiple_expts(srcDir, input_file_target=input_file_target, output_file=output_file)
+
     ### Select data based on rules ###
     input_file = 'tests/combine_39.csv'
     threshold_list = [0.5, 0.5, 0.5, 0.5, 0.5]
-    select_cmps(input_file, threshold_list, how='any', output_file=None, output_option='selected')
+    select_compounds(input_file, threshold_list, how='any', output_file=None, output_option='selected')
 
     ### Select data based on multiple rules ###
     srcDir = 'tests/prediction'
     input_file_target = 'tests/target.csv'
     threshold = 0.5
     output_file = 'predicted_results'
-    select_cmps_by_multi_strategies(srcDir, input_file_target, threshold, output_file, output_option='selected')
+    select_compounds_by_multi_strategies(srcDir, input_file_target, threshold, output_file, output_option='selected')
 
     ### Calculate jaccard similarity between different experiments ###
     input_file = 'tests/combine_39.csv'
