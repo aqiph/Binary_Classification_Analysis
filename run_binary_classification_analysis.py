@@ -15,34 +15,27 @@ if module_path not in sys.path:
     sys.path.append(module_path)
     print('Add module path')
 
-from main import combine_multiple_expts, print_PR_for_multiple_expts, plot_PR,\
-    select_compounds, select_compounds_by_multi_strategies, get_jaccard_similarity
+from main import print_PR_for_multiple_expts, plot_PR, select_compounds, select_compounds_by_multi_strategies, get_jaccard_similarity
 
 
 
 if __name__ == '__main__':
-
     ### Calculate and print precision and recall for multiple experiments ###
-    srcDir = 'tests/prediction'
-    threshold = 0.5
-    output_file = 'predicted_results'
-    print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label', output_file=output_file)
+    # srcDir = 'tests/prediction'
+    # threshold = 0.5
+    # output_file = 'predicted_results'
+    # print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label',
+    #                             output_file=output_file)
 
     ### Plot precision and recall ###
-    input_file = 'tests/expt.csv'
-    num_points = 100
-    plot_PR(input_file, num_points, prediction_column_name='score', target_column_name='Label')
+    # input_file = 'tests/expt.csv'
+    # num_points = 100
+    # plot_PR(input_file, num_points, prediction_column_name='score', target_column_name='Label')
 
-    ### Combine results ###
-    srcDir = 'tests/prediction'
-    input_file_target = 'tests/target.csv'
-    output_file = 'combine'
-    combine_multiple_expts(srcDir, input_file_target=input_file_target, output_file=output_file)
-
-    ### Select data based on rules ###
-    input_file = 'tests/combine_39.csv'
-    threshold_list = [0.5, 0.5, 0.5, 0.5, 0.5]
-    select_compounds(input_file, threshold_list, how='any', output_file=None, output_option='selected')
+    # ### Select data based on rules ###
+    # input_file = 'tests/combine_39.csv'
+    # threshold_list = [0.5, 0.5, 0.5, 0.5, 0.5]
+    # select_compounds(input_file, threshold_list, how='any', output_file=None, output_option='selected')
 
     ### Select data based on multiple rules ###
     srcDir = 'tests/prediction'
@@ -52,8 +45,8 @@ if __name__ == '__main__':
     select_compounds_by_multi_strategies(srcDir, input_file_target, threshold, output_file, output_option='selected')
 
     ### Calculate jaccard similarity between different experiments ###
-    input_file = 'tests/combine_39.csv'
-    threshold = 0.5
-    get_jaccard_similarity(input_file, threshold = threshold)
+    # input_file = 'tests/combine_39.csv'
+    # threshold = 0.5
+    # get_jaccard_similarity(input_file, threshold=threshold)
 
 
