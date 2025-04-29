@@ -21,8 +21,8 @@ from main import select_compounds_by_multi_strategies
 
 if __name__ == '__main__':
     ### Select data based on rules ###
-    srcDir = 'tests/prediction'
-    input_file_target = 'tests/target.csv'
+    srcDir = 'tests/test_inference/prediction'
+    input_file_target = 'tests/test_inference/target.csv'
     threshold = 0.5
     output_file = 'predicted_results'
     select_compounds_by_multi_strategies(srcDir, input_file_target, threshold, output_file, output_option='selected')

@@ -22,13 +22,13 @@ from main import print_PR_for_multiple_expts, plot_PR
 if __name__ == '__main__':
 
     ### Calculate precision and recall for multiple experiments ###
-    srcDir = 'tests/prediction'
+    srcDir = 'tests/test_performance/prediction'
     threshold = 0.5
     output_file = None
     print_PR_for_multiple_expts(srcDir, threshold, prediction_column_name='score', target_column_name='Label', output_file=output_file)
 
     ### Plot precision and recall ###
     for i in range(5):
-        input_file = f'tests/prediction/prediction_model{i}.csv'
+        input_file = f'tests/test_performance/prediction/prediction_model{i}.csv'
         num_points = 100
         plot_PR(input_file, num_points, prediction_column_name='score', target_column_name='Label')
