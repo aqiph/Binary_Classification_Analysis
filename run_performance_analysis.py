@@ -29,6 +29,6 @@ if __name__ == '__main__':
 
     ### Plot precision and recall ###
     for i in range(5):
-        input_file = f'tests/prediction/Fold_{i}.csv'
+        input_file = f'tests/prediction/prediction_model{i}.csv'
         num_points = 100
         plot_PR(input_file, num_points, prediction_column_name='score', target_column_name='Label')
