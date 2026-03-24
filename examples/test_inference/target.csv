@@ -1,0 +1,12 @@
+,ID,SMILES,Cleaned_SMILES,Assay,Assay_Parameter,Operator,Value,Units,Label
+0,GDI13-563,CC([C@H]1C(NC(N=C2C(F)(F)F)=CC=C2N3N=CC=N3)=O)([C@H]1C4=NC=C(F)C=N4)C,CC1(C)C(C(=O)Nc2ccc(-n3nccn3)c(C(F)(F)F)n2)C1c1ncc(F)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,8.1,uL/min/mg,0
+1,GDI13-564,CC([C@H]1C(NC(N=C2C(F)(F)F)=CC=C2N3N=CC=N3)=O)([C@H]1C4=NC=C(Cl)C=N4)C,CC1(C)C(C(=O)Nc2ccc(-n3nccn3)c(C(F)(F)F)n2)C1c1ncc(Cl)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,19.4,uL/min/mg,0
+2,GDI13-596,O=C(NC1=CC=C(N2N=CC=N2)C(C(F)F)=N1)[C@H](C3(C)C)[C@@H]3C4=NC=C(F)C=N4,CC1(C)C(C(=O)Nc2ccc(-n3nccn3)c(C(F)F)n2)C1c1ncc(F)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,17.8,uL/min/mg,0
+3,GDI13-597,O=C(NC1=CC=C(N2N=CC=N2)C(C(F)F)=N1)[C@H](C3(C)C)[C@@H]3C4=NC=C(Cl)C=N4,CC1(C)C(C(=O)Nc2ccc(-n3nccn3)c(C(F)F)n2)C1c1ncc(Cl)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,16.5,uL/min/mg,0
+4,GDI13-609,O=C(NC1=CC=C(C2=NNN=C2)C(C(F)(F)F)=N1)[C@H](C3(C)C)[C@@H]3C4=NC=C(F)C=N4,CC1(C)C(C(=O)Nc2ccc(-c3cn[nH]n3)c(C(F)(F)F)n2)C1c1ncc(F)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,4.8,uL/min/mg,0
+5,GDI13-602,O=C(NC1=CC=C(C2=NN(C3CCNCC3)N=C2)C(C(F)(F)F)=N1)[C@H](C4(C)C)[C@@H]4C5=NC=C(F)C=N5,CC1(C)C(C(=O)Nc2ccc(-c3cnn(C4CCNCC4)n3)c(C(F)(F)F)n2)C1c1ncc(F)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,20.6,uL/min/mg,0
+6,GDI13-598,O=C(NC1=CC=C(N2N=CC(CN3CCOCC3)=N2)C(C(F)(F)F)=N1)[C@H](C4(C)C)[C@@H]4C5=NC=C(F)C=N5,CC1(C)C(C(=O)Nc2ccc(-n3ncc(CN4CCOCC4)n3)c(C(F)(F)F)n2)C1c1ncc(F)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,204.3,uL/min/mg,1
+7,GDI13-601,O=C(NC1=CC=C(C2=NN(CCN3CCOCC3)N=C2)C(C(F)(F)F)=N1)[C@H](C4(C)C)[C@@H]4C5=NC=C(F)C=N5,CC1(C)C(C(=O)Nc2ccc(-c3cnn(CCN4CCOCC4)n3)c(C(F)(F)F)n2)C1c1ncc(F)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,555.2,uL/min/mg,1
+8,GDI13-606,O=C(NC1=CC=C(C2=NN(CCO)N=C2)C(C(F)(F)F)=N1)[C@H](C3(C)C)[C@@H]3C4=NC=C(F)C=N4,CC1(C)C(C(=O)Nc2ccc(-c3cnn(CCO)n3)c(C(F)(F)F)n2)C1c1ncc(F)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,12.6,uL/min/mg,0
+9,GDI13-636,CC1(C)[C@H]([C@@H]1C(NC2=CC=C(C(C(F)(F)F)=N2)N3N=C(C)C=N3)=O)C4=NC=C(F)C=N4,Cc1cnn(-c2ccc(NC(=O)C3C(c4ncc(F)cn4)C3(C)C)nc2C(F)(F)F)n1,Mouse liver microsomal stability,MLM Clint(mic),=,38.7,uL/min/mg,1
+10,GDI13-652,CC1(C)[C@H]([C@@H]1C(NC2=CC=C(C(C(F)(F)F)=N2)N3N=C(C(F)(F)F)C=N3)=O)C4=NC=C(F)C=N4,CC1(C)C(C(=O)Nc2ccc(-n3ncc(C(F)(F)F)n3)c(C(F)(F)F)n2)C1c1ncc(F)cn1,Mouse liver microsomal stability,MLM Clint(mic),=,12.3,uL/min/mg,0
